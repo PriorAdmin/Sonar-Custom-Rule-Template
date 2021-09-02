@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SpringControllerRequestMappingEntityRule.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SonarQube Java :: Documentation :: Custom Rules Example</a> &gt; <a href="index.source.html" class="el_package">org.sonar.samples.java.checks</a> &gt; <span class="el_source">SpringControllerRequestMappingEntityRule.java</span></div><h1>SpringControllerRequestMappingEntityRule.java</h1><pre class="source lang-java linenums">/*
+ * SonarQube Java
+ * Copyright (C) 2012-2021 SonarSource SA
+ * mailto:info AT sonarsource DOT com
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+package org.sonar.samples.java.checks;
+
+import org.sonar.check.Rule;
+import org.sonar.plugins.java.api.JavaFileScanner;
+import org.sonar.plugins.java.api.JavaFileScannerContext;
+import org.sonar.plugins.java.api.semantic.Symbol;
+import org.sonar.plugins.java.api.semantic.SymbolMetadata;
+import org.sonar.plugins.java.api.tree.BaseTreeVisitor;
+import org.sonar.plugins.java.api.tree.MethodTree;
+import org.sonar.plugins.java.api.tree.TypeTree;
+import org.sonar.plugins.java.api.tree.VariableTree;
+
+@Rule(key = &quot;SpringControllerRequestMappingEntity&quot;)
+<span class="fc" id="L33">public class SpringControllerRequestMappingEntityRule extends BaseTreeVisitor implements JavaFileScanner {</span>
+
+  private JavaFileScannerContext context;
+
+  @Override
+  public void scanFile(JavaFileScannerContext context) {
+<span class="fc" id="L39">    this.context = context;</span>
+<span class="fc" id="L40">    scan(context.getTree());</span>
+<span class="fc" id="L41">  }</span>
+
+  /**
+   * Overriding the visitor method to implement the logic of the rule.
+   * @param tree AST of the visited method.
+   */
+  @Override
+  public void visitMethod(MethodTree tree) {
+<span class="fc" id="L49">    Symbol.MethodSymbol methodSymbol = tree.symbol();</span>
+
+<span class="fc" id="L51">    SymbolMetadata parentClassOwner = methodSymbol.owner().metadata();</span>
+<span class="fc" id="L52">    boolean isControllerContext = parentClassOwner.isAnnotatedWith(&quot;org.springframework.stereotype.Controller&quot;);</span>
+
+<span class="fc bfc" id="L54" title="All 4 branches covered.">    if (isControllerContext &amp;&amp; methodSymbol.metadata().isAnnotatedWith(&quot;org.springframework.web.bind.annotation.RequestMapping&quot;)) {</span>
+
+<span class="fc bfc" id="L56" title="All 2 branches covered.">      for (VariableTree param : tree.parameters()) {</span>
+<span class="fc" id="L57">        TypeTree typeOfParam = param.type();</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">        if (typeOfParam.symbolType().symbol().metadata().isAnnotatedWith(&quot;javax.persistence.Entity&quot;)) {</span>
+<span class="fc" id="L59">          context.reportIssue(this, typeOfParam, String.format(&quot;Don't use %s here because it's an @Entity&quot;, typeOfParam.symbolType().name()));</span>
+        }
+<span class="fc" id="L61">      }</span>
+
+    }
+<span class="fc" id="L64">    super.visitMethod(tree);</span>
+<span class="fc" id="L65">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

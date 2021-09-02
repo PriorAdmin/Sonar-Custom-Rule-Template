@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MyJavaRulesDefinition.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SonarQube Java :: Documentation :: Custom Rules Example</a> &gt; <a href="index.source.html" class="el_package">org.sonar.samples.java</a> &gt; <span class="el_source">MyJavaRulesDefinition.java</span></div><h1>MyJavaRulesDefinition.java</h1><pre class="source lang-java linenums">/*
+ * SonarQube Java
+ * Copyright (C) 2012-2021 SonarSource SA
+ * mailto:info AT sonarsource DOT com
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+package org.sonar.samples.java;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Set;
+import org.sonar.api.server.rule.RulesDefinition;
+import org.sonarsource.analyzer.commons.RuleMetadataLoader;
+
+/**
+ * Declare rule metadata in server repository of rules.
+ * That allows to list the rules in the page &quot;Rules&quot;.
+ */
+<span class="fc" id="L33">public class MyJavaRulesDefinition implements RulesDefinition {</span>
+
+  // don't change that because the path is hard coded in CheckVerifier
+  private static final String RESOURCE_BASE_PATH = &quot;org/sonar/l10n/java/rules/java&quot;;
+
+  public static final String REPOSITORY_KEY = &quot;mycompany-java&quot;;
+
+  // Add the rule keys of the rules which need to be considered as template-rules
+<span class="fc" id="L41">  private static final Set&lt;String&gt; RULE_TEMPLATES_KEY = Collections.emptySet();</span>
+
+  @Override
+  public void define(Context context) {
+<span class="fc" id="L45">    NewRepository repository = context.createRepository(REPOSITORY_KEY, &quot;java&quot;).setName(&quot;MyCompany Custom Repository&quot;);</span>
+
+<span class="fc" id="L47">    RuleMetadataLoader ruleMetadataLoader = new RuleMetadataLoader(RESOURCE_BASE_PATH);</span>
+
+<span class="fc" id="L49">    ruleMetadataLoader.addRulesByAnnotatedClass(repository, new ArrayList&lt;&gt;(RulesList.getChecks()));</span>
+
+<span class="fc" id="L51">    setTemplates(repository);</span>
+
+<span class="fc" id="L53">    repository.done();</span>
+<span class="fc" id="L54">  }</span>
+
+  private static void setTemplates(NewRepository repository) {
+<span class="fc" id="L57">    RULE_TEMPLATES_KEY.stream()</span>
+<span class="fc" id="L58">      .map(repository::rule)</span>
+<span class="fc" id="L59">      .filter(Objects::nonNull)</span>
+<span class="pc" id="L60">      .forEach(rule -&gt; rule.setTemplate(true));</span>
+<span class="fc" id="L61">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
